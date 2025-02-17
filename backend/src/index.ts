@@ -31,9 +31,11 @@ app.use(express.static(path.join(__dirname,"../../frontend/dist")));
 app.use("/api/auth",authRoutes)
 app.use("/api/users",userRoutes)
 app.use("/api/my-hotels",myHotelRoutes)
-app.get("/api/test",async(req:Request,res:Response)=>{
-    res.json({message:"Hello!"});
+
+app.get("*",(req:Request,res:Response)=>{
+    res.sendFile(path.join(__dirname,'../../frontend/dist/index.html'));
 });
+
 app.listen(5000,()=>{
     console.log("server running on localhost 5000");
 });
