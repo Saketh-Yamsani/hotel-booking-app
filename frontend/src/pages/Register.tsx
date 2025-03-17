@@ -20,7 +20,6 @@ const Register=()=>{
         onSuccess:async()=>{
             showToast({message:"Registration Successful!",type:"SUCCESS"})
             await queryClient.invalidateQueries("validateToken");
-            navigate("/signin");
         },
         onError:(error:Error)=>{
             showToast({message:error.message,type:"ERROR"})
@@ -29,6 +28,7 @@ const Register=()=>{
 
     const onSubmit=handleSubmit((data)=>{
         mutation.mutate(data);
+        navigate("/signin");
     })
     return(
         <form className="flex-col gap-5" onSubmit={onSubmit}>
