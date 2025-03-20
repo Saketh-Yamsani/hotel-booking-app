@@ -99,11 +99,19 @@ const Search = () => {
             {hotelData?.pagination.total} Hotels found
             {search.destination ? ` in ${search.destination}` : ""}
           </span>
-          <select value={sortOption} onChange={(event) => setSortOption(event.target.value)} className="p-2 border rounded-md">
+          <select
+            value={sortOption}
+            onChange={(event) => setSortOption(event.target.value)}
+            className="p-2 border rounded-md"
+          >
             <option value="">Sort By</option>
             <option value="starRating">Star Rating</option>
-            <option value="pricePerNightAsc">Price Per Night (low to high)</option>
-            <option value="pricePerNightDesc">Price Per Night (high to low)</option>
+            <option value="pricePerNightAsc">
+              Price Per Night (low to high)
+            </option>
+            <option value="pricePerNightDesc">
+              Price Per Night (high to low)
+            </option>
           </select>
         </div>
         {hotelData?.data.map((hotel) => (

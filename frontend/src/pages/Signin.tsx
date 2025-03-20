@@ -4,24 +4,25 @@ import * as apiClient from "../api-client";
 import { useAppContext } from "../contexts/AppContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-export type SigninFormData = {
+export type SignInFormData = {
   email: string;
   password: string;
 };
 
-const Signin = () => {
+const SignIn = () => {
   const { showToast } = useAppContext();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
   const location = useLocation();
 
   const {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm<SigninFormData>();
+  } = useForm<SignInFormData>();
 
-  const mutation = useMutation((formData: SigninFormData) => apiClient.Signin(formData), {
+  const mutation = useMutation(apiClient.signIn, {
     onSuccess: async () => {
       showToast({ message: "Sign in Successful!", type: "SUCCESS" });
       await queryClient.invalidateQueries("validateToken");
@@ -45,8 +46,10 @@ const Signin = () => {
           type="email"
           className="border rounded w-full py-1 px-2 font-normal"
           {...register("email", { required: "This field is required" })}
-        />
-        {errors.email && <span className="text-red-500">{errors.email.message}</span>}
+        ></input>
+        {errors.email && (
+          <span className="text-red-500">{errors.email.message}</span>
+        )}
       </label>
       <label className="text-gray-700 text-sm font-bold flex-1">
         Password
@@ -60,8 +63,10 @@ const Signin = () => {
               message: "Password must be at least 6 characters",
             },
           })}
-        />
-        {errors.password && <span className="text-red-500">{errors.password.message}</span>}
+        ></input>
+        {errors.password && (
+          <span className="text-red-500">{errors.password.message}</span>
+        )}
       </label>
       <span className="flex items-center justify-between">
         <span className="text-sm">
@@ -70,7 +75,10 @@ const Signin = () => {
             Create an account here
           </Link>
         </span>
-        <button type="submit" className="bg-blue-600 text-white p-2 font-bold hover:bg-blue-500 text-xl">
+        <button
+          type="submit"
+          className="bg-blue-600 text-white p-2 font-bold hover:bg-blue-500 text-xl"
+        >
           Login
         </button>
       </span>
@@ -78,4 +86,4 @@ const Signin = () => {
   );
 };
 
-export default Signin;
+export default SignIn;
