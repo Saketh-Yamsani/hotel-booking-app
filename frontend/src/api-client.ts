@@ -1,5 +1,5 @@
 import { RegisterFormData } from "./pages/Register";
-import { SignInFormData } from "./pages/SignIn";
+import { SignInFormData } from "./pages/Sign-In";
 import {
   HotelSearchResponse,
   HotelType,

@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 import Layout from "./layouts/layout";
 import Register from "./pages/Register";
-import SignIn from "./pages/SignIn";
+import SignIn from "./pages/Sign-In";
 import AddHotel from "./pages/AddHotel";
 import { useAppContext } from "./contexts/AppContext";
 import MyHotels from "./pages/MyHotels";
