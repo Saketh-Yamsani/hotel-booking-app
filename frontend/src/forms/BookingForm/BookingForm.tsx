@@ -1,13 +1,19 @@
 import { useForm } from "react-hook-form";
-import { UserType } from "../../../../backend/src/shared/types";
+import {
+  PaymentIntentResponse,
+  UserType,
+} from "../../../../backend/src/shared/types";
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { StripeCardElement } from "@stripe/stripe-js";
 import { useSearchContext } from "../../contexts/SearchContext";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useMutation } from "react-query";
 import * as apiClient from "../../api-client";
 import { useAppContext } from "../../contexts/AppContext";
 
 type Props = {
   currentUser: UserType;
+  paymentIntent: PaymentIntentResponse;
 };
 
 export type BookingFormData = {
@@ -19,12 +25,18 @@ export type BookingFormData = {
   checkIn: string;
   checkOut: string;
   hotelId: string;
+  paymentIntentId: string;
   totalCost: number;
 };
 
-const BookingForm = ({ currentUser }: Props) => {
+const BookingForm = ({ currentUser, paymentIntent }: Props) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const navigate = useNavigate(); // ✅ added
+
   const search = useSearchContext();
   const { hotelId } = useParams();
+
   const { showToast } = useAppContext();
 
   const { mutate: bookRoom, isLoading } = useMutation(
@@ -32,6 +44,7 @@ const BookingForm = ({ currentUser }: Props) => {
     {
       onSuccess: () => {
         showToast({ message: "Booking Saved!", type: "SUCCESS" });
+        navigate("/my-bookings"); // ✅ redirect after success
       },
       onError: () => {
         showToast({ message: "Error saving booking", type: "ERROR" });
@@ -49,12 +62,25 @@ const BookingForm = ({ currentUser }: Props) => {
       checkIn: search.checkIn.toISOString(),
       checkOut: search.checkOut.toISOString(),
       hotelId: hotelId,
-      totalCost: 0, // Removed paymentIntent
+      totalCost: paymentIntent.totalCost,
+      paymentIntentId: paymentIntent.paymentIntentId,
     },
   });
 
-  const onSubmit = (formData: BookingFormData) => {
-    bookRoom(formData);
+  const onSubmit = async (formData: BookingFormData) => {
+    if (!stripe || !elements) {
+      return;
+    }
+
+    const result = await stripe.confirmCardPayment(paymentIntent.clientSecret, {
+      payment_method: {
+        card: elements.getElement(CardElement) as StripeCardElement,
+      },
+    });
+
+    if (result.paymentIntent?.status === "succeeded") {
+      bookRoom({ ...formData, paymentIntentId: result.paymentIntent.id });
+    }
   };
 
   return (
@@ -94,6 +120,24 @@ const BookingForm = ({ currentUser }: Props) => {
             {...register("email")}
           />
         </label>
+      </div>
+
+      <div className="space-y-2">
+        <h2 className="text-xl font-semibold">Your Price Summary</h2>
+        <div className="bg-blue-200 p-4 rounded-md">
+          <div className="font-semibold text-lg">
+            Total Cost: ₹{paymentIntent.totalCost.toFixed(2)}
+          </div>
+          <div className="text-xs">Includes taxes and charges</div>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <h3 className="text-xl font-semibold">Payment Details</h3>
+        <CardElement
+          id="payment-element"
+          className="border rounded-md p-2 text-sm"
+        />
       </div>
 
       <div className="flex justify-end">
