@@ -1,17 +1,25 @@
-import { useQuery } from "react-query";
+import { useQuery, useMutation } from "react-query";
 import { Link } from "react-router-dom";
 import * as apiClient from "../api-client";
 import { BsBuilding, BsMap } from "react-icons/bs";
 import { BiHotel, BiMoney, BiStar } from "react-icons/bi";
 
 const MyHotels = () => {
-  const { data: hotelData } = useQuery(
-    "fetchMyHotels",
-    apiClient.fetchMyHotels,
-    {
-      onError: () => {},
+  const { data: hotelData, refetch } = useQuery("fetchMyHotels", apiClient.fetchMyHotels, {
+    onError: () => {},
+  });
+
+  const deleteHotelMutation = useMutation(apiClient.deleteHotel, {
+    onSuccess: () => {
+      refetch(); // Refetch the data to update the list after deletion
+    },
+  });
+
+  const handleDelete = (hotelId) => {
+    if (window.confirm("Are you sure you want to delete this hotel?")) {
+      deleteHotelMutation.mutate(hotelId);
     }
-  );
+  };
 
   if (!hotelData) {
     return <span>No Hotels found</span>;
@@ -21,16 +29,14 @@ const MyHotels = () => {
     <div className="space-y-5">
       <span className="flex justify-between">
         <h1 className="text-3xl font-bold">My Hotels</h1>
-        <Link
-          to="/add-hotel"
-          className="flex bg-blue-600 text-white text-xl font-bold p-2 hover:bg-blue-500"
-        >
+        <Link to="/add-hotel" className="flex bg-blue-600 text-white text-xl font-bold p-2 hover:bg-blue-500">
           Add Hotel
         </Link>
       </span>
       <div className="grid grid-cols-1 gap-8">
         {hotelData.map((hotel) => (
           <div
+            key={hotel._id}
             data-testid="hotel-card"
             className="flex flex-col justify-between border border-slate-300 rounded-lg p-8 gap-5"
           >
@@ -57,13 +63,19 @@ const MyHotels = () => {
                 {hotel.starRating} Star Rating
               </div>
             </div>
-            <span className="flex justify-end">
+            <span className="flex justify-between">
               <Link
                 to={`/edit-hotel/${hotel._id}`}
                 className="flex bg-blue-600 text-white text-xl font-bold p-2 hover:bg-blue-500"
               >
                 View Details
               </Link>
+              <button
+                onClick={() => handleDelete(hotel._id)}
+                className="flex bg-red-600 text-white text-xl font-bold p-2 hover:bg-red-500"
+              >
+                Delete
+              </button>
             </span>
           </div>
         ))}

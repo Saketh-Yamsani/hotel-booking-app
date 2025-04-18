@@ -66,6 +66,30 @@ router.get("/", verifyToken, async (req: Request, res: Response) => {
   }
 });
 
+// Add this DELETE route for hotel deletion
+
+// In your delete route
+router.delete("/:hotelId", verifyToken, async (req: Request, res: Response) => {
+  try {
+    const hotelId: string = req.params.hotelId; // Explicitly typing hotelId as a string
+    const hotel = await Hotel.findOneAndDelete({
+      _id: hotelId,
+      userId: req.userId,
+    });
+
+    if (!hotel) {
+      res.status(404).json({ message: "Hotel not found or you don't have permission to delete this hotel" });
+      return;
+    }
+
+    res.status(200).json({ message: "Hotel deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting hotel" });
+  }
+});
+
+
+
 router.get("/:id", verifyToken, async (req: Request, res: Response) => {
   const id = req.params.id.toString();
   try {
