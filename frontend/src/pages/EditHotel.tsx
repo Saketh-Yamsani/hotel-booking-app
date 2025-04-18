@@ -19,7 +19,7 @@ const EditHotel = () => {
 
   const { mutate, isLoading } = useMutation(apiClient.updateMyHotelById, {
     onSuccess: () => {
-      showToast({ message: "Hotel Saved!", type: "SUCCESS" });
+      showToast({ message: "Hotel Updated!", type: "SUCCESS" });
       navigate("/my-hotels"); // Redirects to My Hotels page
     },
     onError: () => {
