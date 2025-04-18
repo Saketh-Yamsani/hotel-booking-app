@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "react-query";
 import { Link } from "react-router-dom";
 import * as apiClient from "../api-client";
@@ -9,7 +9,7 @@ import { useAppContext } from "../contexts/AppContext";  // Import the context t
 const MyHotels = () => {
   const { showToast } = useAppContext();  // Access showToast from the context
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedHotelId, setSelectedHotelId] = useState(null);
+  const [selectedHotelId, setSelectedHotelId] = useState<string | null>(null); // Type for selectedHotelId
 
   const { data: hotelData, refetch } = useQuery("fetchMyHotels", apiClient.fetchMyHotels, {
     onError: () => {},
@@ -26,7 +26,7 @@ const MyHotels = () => {
     },
   });
 
-  const handleDelete = (hotelId) => {
+  const handleDelete = (hotelId: string) => { // Explicit type for hotelId
     setSelectedHotelId(hotelId);
     setIsModalOpen(true);
   };
